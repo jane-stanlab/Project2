@@ -1,0 +1,23 @@
+---
+title: "Project 2 -- Signature creation and iLINCS API"
+output:
+  pdf_document: default
+  word_document: default
+---
+
+This assignment builds upon the R/shiny class and expands the API example.
+
+1. For the assignment use the dataset TCGA_breast_cancer_ERstatus_allGenes.tsv. You may choose to "debug" your code with a smaller dataset TCGA_breast_cancer_ERpositive_vs_ERnegative_PAM50.tsv or TCGA_breast_cancer_LumA_vs_Basal_PAM50.tsv. 
+2. Your assignment is to develop code using R Shiny to present user interface that allows a user to upload a tsv file, presents an option to split the samples into two groups based on the available metadata and create a signature. The signature is then submitted to the iLincs API which retrieves concordant signatures.
+4. Template is provided in the Project 2 github project (https://github.uc.edu/uc-datascience/Project2.git).
+5. The template is missing the calculation of the differential expression -- please use t-test to calculate t-statistic / p-value.
+6. Expand the template to allow users to filter the input file to L1000 genes only (See the include L1000.txt file).
+7. Further expand the template to allow users to submit only top 100 differentially expressed genes.
+8. Compare results with iLincs
+9. Extra credit for a heatmap or other visualizations.
+
+The assignment is due on -- March XX, 2020 midnight. 
+
+The submission should be zip compressed file named "project2-[*your UC username*].zip" (e.g. "project2-lastnfi.zip") which includes any supporting R files. The zip file should be uploaded canopy. The assignment entry in Canopy will be created shortly.
+
+
