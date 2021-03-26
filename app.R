@@ -14,10 +14,10 @@ library(httr)
 options(shiny.maxRequestSize=70*1024^2)
 
 ui <- fluidPage(
-
+  
   # Application title
   titlePanel("File upload"),
-
+  
   # Sidebar with a slider input for number of bins
   sidebarLayout(
     sidebarPanel(
@@ -28,7 +28,7 @@ ui <- fluidPage(
       selectInput("difffunction", "Differential function:", choices=c("t-test")),
       actionButton("compute", "Compute and Submit Signature")
     ),
-
+    
     # Show a plot of the generated distribution
     mainPanel(
       dataTableOutput("signature_data"),
@@ -61,7 +61,7 @@ server <- function(input, output, session) {
     
     isolate({ 
       file <- (inFile$datapath)
-
+      
       values$header <- scan(file, nlines = 1, sep="\t", what = character())
       values$data <- read.table(file, skip = 2, header = FALSE, sep = "\t", quote = "", check.names=FALSE)
       names(values$data) <- values$header 
@@ -75,8 +75,8 @@ server <- function(input, output, session) {
   }, caption = "First 50 genes, first 10 samples")
   
   observe({
-     # fill in variable selection from the input file
-     updateSelectInput(session, "variable", choices=as.character(values$header2[1,]))
+    # fill in variable selection from the input file
+    updateSelectInput(session, "variable", choices=as.character(values$header2[1,]))
   })
   
   # handle UI group values update based on selected variable
@@ -97,7 +97,7 @@ server <- function(input, output, session) {
       #
       group1 <- names(values$data)[values$header2==input$group1]
       group2 <- names(values$data)[values$header2==input$group2]
-
+      
       #
       # ensure the values are numeric
       #
@@ -111,13 +111,12 @@ server <- function(input, output, session) {
       if (input$difffunction=="t-test") {
         diff_result <- as.data.frame(apply(values$values, 1, 
                                            function(x) { t.test(unlist(x[group1], use.names = FALSE),
-                                                              unlist(x[group2], use.names = FALSE))$p.value }))
+                                                                unlist(x[group2], use.names = FALSE))$p.value }))
         
-        # FIXME: fill in
         # Add t statistic as the measure of differential expression (Value_LogDiffExp)
         diff_result$Value_LogDiffExp <- apply(values$values, 1, 
                                               function(x) { t.test(unlist(x[group1], use.names = FALSE),
-                                                                 unlist(x[group2], use.names = FALSE))$p.value })
+                                                                   unlist(x[group2], use.names = FALSE))$statistic })
       }
       
       #
@@ -128,17 +127,18 @@ server <- function(input, output, session) {
       colnames(diff_result) <- c(output_id_column_name, "Significance_pvalue", "Value_LogDiffExp")
       
       diff_result <- diff_result[, c(1, 3, 2)]
-                                              
-      # FIXME: fill in
+      
       # choose only L1000 genes
-      # l1000genes <- ...
-      # diff_result <- ...
+      if (input$L1000 == TRUE) {
+        genes<-read.csv2("L1000.txt", sep='\t')
+        L1000 <- genes[genes$pr_is_lm=='1',]$pr_gene_symbol
+        diff_result <- diff_result[diff_result[,1] %in% L1000,]
+      }
       
-      
-      # FIXME: fill in
       # choose top 100 most differentially expressed genes
-      # diff_result <- ...
-      
+      if (input$topgenes == "Top 100") {
+        diff_result <- head(diff_result[order(-abs(diff_result$Value_LogDiffExp)),],n=100)  #The most differentiated values are at the top
+      }
       
       #
       # show signature in a table
@@ -172,4 +172,5 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui = ui, server = server)
+
 
